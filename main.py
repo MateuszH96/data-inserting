@@ -1,2 +1,5 @@
-import pandas as pd
-import wget
+from CITIES.sendCities import inserData
+from weather_data.sendWeatherData import fillDatabase
+
+inserData()
+fillDatabase()
