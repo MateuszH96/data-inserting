@@ -15,6 +15,7 @@ def removeFile(*files):
         if i in os.listdir('.'):
             os.remove(i)
 
+
 def removeCity(filename):
     fin = open(filename, 'rt')
     fout = open(REMOVED_CITY_FILE, 'wt')
@@ -24,6 +25,7 @@ def removeCity(filename):
         fout.write(toWrite)
     fin.close()
     fout.close()
+
 
 def prepareAndSend(con, cursor, df, dataFrameRow):
     JSON_TO_SEND["id_stacji"] = str(df[STATION_INDEX][dataFrameRow])
@@ -59,7 +61,7 @@ def sendDataToDatabase(filename):
                 fout.write(line.replace('""', '" "'))
     removeCity(OUT_FILENAME)
     df = pd.read_csv(REMOVED_CITY_FILE, header=None, encoding=ENCODING)
-    removeFile(REMOVED_CITY_FILE,filename)
+    removeFile(REMOVED_CITY_FILE, filename)
     for row in df.index:
         prepareAndSend(con, cursor, df, row)
     con.close()
@@ -78,6 +80,7 @@ def fillDatabase():
                 urlPath = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}'
                 urlFilename = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}_{stationNum}_s.zip'
                 wget.download(URL_ARCHIVE_DATA+f'{urlPath}/{urlFilename}')
+                print('\n')
                 with ZipFile(urlFilename, 'r') as zip:
                     zip.extractall()
                 removeFile(urlFilename)
