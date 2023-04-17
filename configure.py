@@ -17,6 +17,8 @@ END_YEAR = 1965
 OUT_FILENAME = 'out.csv'
 ENCODING = 'iso-8859-1'
 
+REMOVED_CITY_FILE = "noCity.csv"
+
 CURRENT_YEAR = 2023
 URL_ARCHIVE_DATA = 'https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/terminowe/synop/'
 JSON_TO_SEND = {

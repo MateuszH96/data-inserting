@@ -10,6 +10,21 @@ import logging
 pd.options.mode.chained_assignment = None
 
 
+def removeFile(*files):
+    for i in files:
+        if i in os.listdir('.'):
+            os.remove(i)
+
+def removeCity(filename):
+    fin = open(filename, 'rt')
+    fout = open(REMOVED_CITY_FILE, 'wt')
+    for line in fin:
+        indexes = [i for i, x in enumerate(line) if x == '"']
+        toWrite = line[:indexes[2]+1]+' '+line[indexes[3]:]
+        fout.write(toWrite)
+    fin.close()
+    fout.close()
+
 def prepareAndSend(con, cursor, df, dataFrameRow):
     JSON_TO_SEND["id_stacji"] = str(df[STATION_INDEX][dataFrameRow])
     JSON_TO_SEND["stacja"] = str(df[CITY_INDEX][dataFrameRow])
@@ -42,9 +57,9 @@ def sendDataToDatabase(filename):
         with open(OUT_FILENAME, "wt") as fout:
             for line in fin:
                 fout.write(line.replace('""', '" "'))
-    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING, on_bad_lines=False)
-    os.remove(OUT_FILENAME)
-    os.remove(filename)
+    removeCity(OUT_FILENAME)
+    df = pd.read_csv(REMOVED_CITY_FILE, header=None, encoding=ENCODING)
+    removeFile(REMOVED_CITY_FILE,filename)
     for row in df.index:
         prepareAndSend(con, cursor, df, row)
     con.close()
@@ -53,30 +68,33 @@ def sendDataToDatabase(filename):
 def fillDatabase():
     logging.basicConfig(filename=f'send_data_to_database.log', level=logging.ERROR,
                         format='%(asctime)s %(levelname)s %(name)s %(message)s')
-    START_YEAR=1960
+    START_YEAR = 1960
     for yearOffset in range(0, 40, 5):
         if yearOffset == 5:
             START_YEAR += 1
         for stationNum in range(100, 1000):
-            urlFilename=''
+            urlFilename = ''
             try:
                 urlPath = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}'
                 urlFilename = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}_{stationNum}_s.zip'
                 wget.download(URL_ARCHIVE_DATA+f'{urlPath}/{urlFilename}')
                 with ZipFile(urlFilename, 'r') as zip:
                     zip.extractall()
-                os.remove(urlFilename)
-                sendDataToDatabase(f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                removeFile(urlFilename)
+                sendDataToDatabase(
+                    f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
 
             except Exception as err:
-                logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                fileReadFailed = f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv'
+                removeFile(fileReadFailed, urlFilename)
+                logging.error(str(err) + fileReadFailed)
 
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
             break
         for stationNum in range(100, 1000):
-            zipFilename=''
+            zipFilename = ''
             if lastYearMonth > 12:
                 break
             try:
@@ -88,8 +106,10 @@ def fillDatabase():
                 wget.download(urlPath)
                 with ZipFile(zipFilename, 'r') as zip:
                     zip.extractall()
-                os.remove(zipFilename)
+                removeFile(zipFilename)
                 sendDataToDatabase(f's_t_{stationNum}_{rok}.csv')
 
             except Exception as err:
-                logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                removeFile(fileReadFailed, zipFilename)
+                logging.error(
+                    str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
