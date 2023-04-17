@@ -188,12 +188,12 @@ EXECUTE PROCEDURE trigger_inserted_values();
 --Functions and Triggers for inserting data into JSON DATA WEATHER
 
 --TEST INSERTING DATA
-INSERT INTO weather.json_data_weather (weather_data) VALUES(
+/*INSERT INTO weather.json_data_weather (weather_data) VALUES(
 '{"id_stacji":"12295","stacja":"Bia\u0142ystok","data_pomiaru":"2023-04-08","godzina_pomiaru":"10","temperatura":"10.1","predkosc_wiatru":"2","kierunek_wiatru":"320","wilgotnosc_wzgledna":"59.7","suma_opadu":"0.01","cisnienie":"1025.3"}'
 );
 INSERT INTO weather.json_data_weather (weather_data) VALUES(
 '{"id_stacji":"12295","stacja":"Bia\u0142ystok","data_pomiaru":"2023-04-08","godzina_pomiaru":"10","temperatura":"10.1","predkosc_wiatru":"2","kierunek_wiatru":"320","wilgotnosc_wzgledna":"59.7","suma_opadu":"0.01","cisnienie":"1025.3"}'
-);
+);*/
 
 select * from weather.json_data_weather;
 select * from weather.dates;

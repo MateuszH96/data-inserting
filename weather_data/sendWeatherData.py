@@ -50,14 +50,13 @@ def sendDataToDatabase(filename):
 
 
 def fillDatabase():
+    logging.basicConfig(filename=f'send_data_to_database.log', level=logging.ERROR,
+                        format='%(asctime)s %(levelname)s %(name)s %(message)s')
     START_YEAR=1960
     for yearOffset in range(0, 40, 5):
         if yearOffset == 5:
             START_YEAR += 1
         for stationNum in range(100, 1000):
-            logging.basicConfig(filename=f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.txt', level=logging.DEBUG,
-                                format='%(asctime)s %(levelname)s %(name)s %(message)s')
-            logger = logging.getLogger(__name__)
             try:
                 urlPath = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}'
                 urlFilename = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}_{stationNum}_s.zip'
@@ -65,19 +64,15 @@ def fillDatabase():
                 with ZipFile(urlFilename, 'r') as zip:
                     zip.extractall()
                 os.remove(urlFilename)
-                sendDataToDatabase(
-                    f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                sendDataToDatabase(f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
 
             except Exception as err:
-                logger.error(err)
+                logging.error(err+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
             break
         for stationNum in range(100, 1000):
-            logging.basicConfig(filename=f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.txt', level=logging.DEBUG,
-                                format='%(asctime)s %(levelname)s %(name)s %(message)s')
-            logger = logging.getLogger(__name__)
             if lastYearMonth > 12:
                 break
             try:
@@ -93,4 +88,4 @@ def fillDatabase():
                 sendDataToDatabase(f's_t_{stationNum}_{rok}.csv')
 
             except Exception as err:
-                logger.error(err)
+                logging.error(err+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
