@@ -1,12 +1,12 @@
 import wget
-from urllib.error import HTTPError
-from ..configure import *
+from configure import *
 import json
 import os
 import psycopg2 as db
 from zipfile import ZipFile
 import pandas as pd
-from ..database import *
+from database import *
+import logging
 
 
 def prepareAndSend(con, cursor, df, dataFrameRow):
@@ -50,12 +50,14 @@ def sendDataToDatabase(filename):
 
 
 def fillDatabase():
-
+    START_YEAR=1960
     for yearOffset in range(0, 40, 5):
         if yearOffset == 5:
             START_YEAR += 1
         for stationNum in range(100, 1000):
-
+            logging.basicConfig(filename=f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.txt', level=logging.DEBUG,
+                                format='%(asctime)s %(levelname)s %(name)s %(message)s')
+            logger = logging.getLogger(__name__)
             try:
                 urlPath = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}'
                 urlFilename = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}_{stationNum}_s.zip'
@@ -66,17 +68,16 @@ def fillDatabase():
                 sendDataToDatabase(
                     f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
 
-            except HTTPError as err:
-                name = err.code
-                print(f'{urlFilename} FILE NOT FOUND')
-
-            except:
-                print('UNEXCEPTED ERROR')
+            except Exception as err:
+                logger.error(err)
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
             break
         for stationNum in range(100, 1000):
+            logging.basicConfig(filename=f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.txt', level=logging.DEBUG,
+                                format='%(asctime)s %(levelname)s %(name)s %(message)s')
+            logger = logging.getLogger(__name__)
             if lastYearMonth > 12:
                 break
             try:
@@ -91,9 +92,5 @@ def fillDatabase():
                 os.remove(zipFilename)
                 sendDataToDatabase(f's_t_{stationNum}_{rok}.csv')
 
-            except HTTPError as err:
-                name = err.code
-                print(f'{zipFilename} FILE NOT FOUND')
-
-            except:
-                print('UNEXCEPTED ERROR')
+            except Exception as err:
+                logger.error(err)

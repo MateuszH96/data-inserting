@@ -1,5 +1,5 @@
 from .DownloadList import downloadList
-from ..configure import *
+from configure import *
 import pandas as pd
 import os
 import psycopg2 as db

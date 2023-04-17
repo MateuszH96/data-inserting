@@ -1,4 +1,4 @@
-from ..configure import *
+from configure import *
 import pandas as pd
 import wget
 
