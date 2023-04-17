@@ -42,7 +42,7 @@ def sendDataToDatabase(filename):
         with open(OUT_FILENAME, "wt") as fout:
             for line in fin:
                 fout.write(line.replace('""', '" "'))
-    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING, on_bad_lines='skip')
+    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING, on_bad_lines=False)
     os.remove(OUT_FILENAME)
     os.remove(filename)
     for row in df.index:
@@ -69,9 +69,8 @@ def fillDatabase():
                 sendDataToDatabase(f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
 
             except Exception as err:
-                if urlFilename != '':
-                    os.remove(urlFilename)
                 logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
@@ -93,6 +92,4 @@ def fillDatabase():
                 sendDataToDatabase(f's_t_{stationNum}_{rok}.csv')
 
             except Exception as err:
-                if zipFilename != '':
-                    os.remove(zipFilename)
                 logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
