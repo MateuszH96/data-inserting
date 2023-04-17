@@ -7,6 +7,7 @@ from zipfile import ZipFile
 import pandas as pd
 from database import *
 import logging
+pd.options.mode.chained_assignment = None
 
 
 def prepareAndSend(con, cursor, df, dataFrameRow):
@@ -41,7 +42,7 @@ def sendDataToDatabase(filename):
         with open(OUT_FILENAME, "wt") as fout:
             for line in fin:
                 fout.write(line.replace('""', '" "'))
-    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING)
+    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING, on_bad_lines='skip')
     os.remove(OUT_FILENAME)
     os.remove(filename)
     for row in df.index:
@@ -57,6 +58,7 @@ def fillDatabase():
         if yearOffset == 5:
             START_YEAR += 1
         for stationNum in range(100, 1000):
+            urlFilename=''
             try:
                 urlPath = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}'
                 urlFilename = f'{START_YEAR+yearOffset}_{END_YEAR+yearOffset}_{stationNum}_s.zip'
@@ -67,12 +69,15 @@ def fillDatabase():
                 sendDataToDatabase(f's_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
 
             except Exception as err:
-                logging.error(err+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                if urlFilename != '':
+                    os.remove(urlFilename)
+                logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
             break
         for stationNum in range(100, 1000):
+            zipFilename=''
             if lastYearMonth > 12:
                 break
             try:
@@ -88,4 +93,6 @@ def fillDatabase():
                 sendDataToDatabase(f's_t_{stationNum}_{rok}.csv')
 
             except Exception as err:
-                logging.error(err+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                if zipFilename != '':
+                    os.remove(zipFilename)
+                logging.error(str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
