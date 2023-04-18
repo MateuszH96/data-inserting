@@ -68,7 +68,7 @@ def sendDataToDatabase(filename):
 
 
 def fillDatabase():
-    logging.basicConfig(filename=f'send_data_to_database.log', level=logging.ERROR,
+    logging.basicConfig(filename=f'send_data_to_database.log', level=logging.INFO,
                         format='%(asctime)s %(levelname)s %(name)s %(message)s')
     START_YEAR = 1960
     for yearOffset in range(0, 40, 5):
@@ -92,6 +92,9 @@ def fillDatabase():
                 removeFile(fileReadFailed, urlFilename)
                 logging.error(str(err) + fileReadFailed)
 
+            else:
+                success=f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv'
+                logging.info(f' file {success} ADDED!')
     lastYearMonth = 1
     for rok in range(2001, CURRENT_YEAR+1):
         if lastYearMonth > 12:
@@ -115,4 +118,7 @@ def fillDatabase():
             except Exception as err:
                 removeFile(fileReadFailed, zipFilename)
                 logging.error(
-                    str(err)+f' s_t_{stationNum}_{START_YEAR+yearOffset}_{END_YEAR+yearOffset}.csv')
+                    str(err)+f' s_t_{stationNum}_{rok}.csv')
+            else:
+                success=f' s_t_{stationNum}_{rok}.csv'
+                logging.info(f' file {success} ADDED!')
