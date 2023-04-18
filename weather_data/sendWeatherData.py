@@ -55,13 +55,13 @@ def sendDataToDatabase(filename):
     con = db.connect(host=HOST, port=PORT, database=DATABASE,
                      user=USER, password=PASSWORD)
     cursor = con.cursor()
-    with open(filename, "rt") as fin:
+    removeCity(filename)
+    with open(REMOVED_CITY_FILE, "rt") as fin:
         with open(OUT_FILENAME, "wt") as fout:
             for line in fin:
                 fout.write(line.replace('""', '" "'))
-    removeCity(OUT_FILENAME)
-    df = pd.read_csv(REMOVED_CITY_FILE, header=None, encoding=ENCODING)
-    removeFile(REMOVED_CITY_FILE, filename)
+    df = pd.read_csv(OUT_FILENAME, header=None, encoding=ENCODING)
+    removeFile(REMOVED_CITY_FILE, filename,OUT_FILENAME)
     for row in df.index:
         prepareAndSend(con, cursor, df, row)
     con.close()
