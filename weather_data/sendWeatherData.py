@@ -17,7 +17,7 @@ def removeFile(*files):
 
 
 def removeCity(filename):
-    fin = open(filename, 'rt')
+    fin = open(filename, 'rt',encoding=ENCODING)
     fout = open(REMOVED_CITY_FILE, 'wt')
     for line in fin:
         indexes = [i for i, x in enumerate(line) if x == '"']
